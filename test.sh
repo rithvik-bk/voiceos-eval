@@ -73,10 +73,10 @@ if run_step "runner: node run.js" "$L1" -- node run.js; then
   assert_contains "$L1" "SHIP SCORE" "scorecard prints a Ship Score"
 fi
 
-# ── 2. Gate benchmark: 4/4 caught, 0 false blocks ──────────────
+# ── 2. Gate benchmark: all wrong actions caught, 0 false blocks ─
 L2="$TMPDIR_SELF/gate.log"
 if run_step "gate: node gate-benchmark.js" "$L2" -- node gate-benchmark.js; then
-  assert_contains "$L2" "4/4 caught" "all 4 wrong-money actions caught & blocked"
+  assert_contains "$L2" "Wrong actions prevented:        100%" "every wrong action (money, recipient, target) caught & blocked"
   assert_contains "$L2" "False-block rate on good calls: 0%" "0 false blocks on correct actions"
 fi
 

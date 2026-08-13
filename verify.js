@@ -72,18 +72,40 @@ function highRiskFromCatalog(catalog) {
   return heuristic.size ? heuristic : DEFAULT_HIGH_RISK;
 }
 
-// pull the recipient/customer the user named. Anchors to "to X" / "X's" first (works
-// on lowercase ASR text), then a verb+name pattern that refuses number/currency words
-// so it can't grab the amount as the recipient.
+// words that are never a real named recipient — so a verb+word pattern can't grab them.
+const STOP = new Set(['the', 'a', 'an', 'my', 'your', 'his', 'her', 'their', 'them', 'it',
+  'me', 'us', 'everyone', 'everybody', 'all', 'someone', 'anyone', 'that', 'this', 'those',
+  'these', 'mom', 'dad', 'him', 'you', 'again', 'now', 'back', 'over']);
+
+// pull the recipient/customer the user named. Anchors to "to X" / "X's" first (works on
+// lowercase ASR text), then a verb+name pattern; refuses stopwords, numbers, currency.
 function utteranceParty(u) {
   const s = u.trim();
-  let m = s.match(/\bto\s+([a-z][a-z]*)/i) || s.match(/\b([a-z][a-z]*)'s\b/i);
+  const good = w => w && !STOP.has(w.toLowerCase()) && !(w.toLowerCase() in NUM_WORDS) && !/^(dollars?|cents?|bucks)$/.test(w.toLowerCase());
+  let m = s.match(/\bto\s+([a-z][a-z]*)/i);
+  if (m && good(m[1])) return m[1];
+  m = s.match(/\b([a-z][a-z]*)'s\b/i);
+  if (m && good(m[1])) return m[1];
+  m = s.match(/\b(?:charge|refund|pay|send|email|message|text|dm|invoice|call)\s+([a-z][a-z]*)/i);
+  if (m && good(m[1])) return m[1];
+  return null;
+}
+
+// destructive tools whose TARGET (which record) must match what the user referenced.
+const DESTRUCTIVE = /(delete|trash|remove|permanent|archive|merge|drop|revoke|cancel|wipe|purge)/i;
+const TARGET_KEYS = ['id', 'issue_id', 'issueId', 'issue', 'file', 'path', 'filename',
+  'message_id', 'messageId', 'event_id', 'eventId', 'target', 'resource_id', 'ticket',
+  'order_id', 'orderId', 'pr', 'pull_request', 'record_id', 'key'];
+
+// the specific target the user named: "delete issue 5", "merge PR 482",
+// "remove file report.pdf". Returns the id/filename token, or null if none was
+// explicitly named. High-precision: only id-like (has a digit) or filename-like
+// (has an extension) tokens — a bare "delete that" yields null and is never blocked.
+function utteranceTarget(u) {
+  let m = u.match(/\b(?:issue|event|message|task|item|ticket|record|order|invoice|pr|pull\s+request|row|entry|number)\s+#?([a-z]*-?\d[\w-]*)/i);
   if (m) return m[1];
-  m = s.match(/\b(?:charge|refund|pay|send)\s+([a-z][a-z]*)/i);
-  if (m) {
-    const w = m[1].toLowerCase();
-    if (!(w in NUM_WORDS) && !/^(dollars?|cents?|bucks)$/.test(w)) return m[1];
-  }
+  m = u.match(/\b(?:file|document|doc|attachment|photo|image|sheet|folder)\s+"?([\w.-]+\.\w+)"?/i);
+  if (m) return m[1];
   return null;
 }
 
@@ -114,6 +136,20 @@ function verify(utterance, tool, args, highRisk = DEFAULT_HIGH_RISK) {
       problems.push(`recipient: you said "${party}", the call targets "${who}"`);
   }
 
+  // destructive-target check: if the user named a SPECIFIC record ("delete issue 5")
+  // and the call carries a target id, the two must agree — otherwise the wrong thing
+  // gets destroyed. Only fires when the user named a target (never false-blocks a
+  // "delete that" with no explicit id, which the gate can't verify).
+  if (DESTRUCTIVE.test(tool)) {
+    const target = pick(TARGET_KEYS);
+    const saidTarget = utteranceTarget(utterance);
+    if (saidTarget != null && target != null) {
+      const s = String(saidTarget).toLowerCase(), g = String(target).toLowerCase();
+      if (!g.includes(s) && !s.includes(g))
+        problems.push(`target: you referenced "${saidTarget}", the call would act on "${target}"`);
+    }
+  }
+
   if (problems.length)
     return { ok: false, reason: problems.join('  |  ') };
   return { ok: true, reason: 'utterance and arguments agree' };
@@ -126,7 +162,9 @@ if (require.main === module) {
   const cases = [
     ['refund forty dollars to Jane', 'refund_payment', { customer: 'John', amount: 400 }],
     ['refund forty dollars to Jane', 'refund_payment', { customer: 'Jane', amount: 40 }],
-    ['charge Alice fifty dollars', 'create_payment', { customer: 'Alice', amount: 50 }]
+    ['charge Alice fifty dollars', 'create_payment', { customer: 'Alice', amount: 50 }],
+    ['delete issue 5', 'delete_issue', { issue_id: 999 }],
+    ['delete issue 5', 'delete_issue', { issue_id: 5 }]
   ];
   console.log('\n  VERIFICATION GATE — high-risk actions checked before they fire\n');
   for (const [u, tool, args] of cases) {
