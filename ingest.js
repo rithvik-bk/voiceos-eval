@@ -34,7 +34,9 @@ function loadRows() {
       { encoding: 'utf8' });
     return out.trim() ? JSON.parse(out) : [];
   }
-  throw new Error('give --db <voiceos.db> or --json <rows.json>');
+  console.error('usage: node ingest.js --db <voiceos.db> [--audit --catalog <manifest>]');
+  console.error('   or: node ingest.js --json <rows.json> [--audit --catalog <manifest>]');
+  process.exit(1);
 }
 
 function parseArgs(a) { try { return JSON.parse(a); } catch { return {}; } }
