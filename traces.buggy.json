@@ -1,0 +1,17 @@
+{
+  "_comment": "OPT-IN FAILING FIXTURE. Run it with: node run.js --traces traces.buggy.json  (add --gate to see a red release gate + non-zero exit). These rows reproduce the classic tool-calling failures — a lookalike-tool collision (send_imessage vs send_email), a mis-extracted parameter (Liked Songs -> Top Hits, 30min -> 60min), and a wrong-money refund ($40 to Jane logged as $400 to John). The safety gate catches the money one before it fires. In production these rows come from an agent_tool_calls export (user_message -> tool -> args, logged BEFORE execution).",
+  "source": "hand-authored fixture reproducing common tool-calling bugs; swap for a real tool-call export",
+  "traces": {
+    "msg-01-direct":        { "tool": "send_imessage", "arguments": { "recipient": "Sam", "body": "I'm running late" } },
+    "msg-02-collision-email": { "tool": "send_email", "arguments": { "recipient": "Sam", "body": "the meeting notes" } },
+    "msg-03-collision-3":  { "tool": "send_email", "arguments": { "recipient": "Riley", "body": "I'm on my way" } },
+    "music-01-liked":       { "tool": "play_playlist", "arguments": { "playlist": "Today's Top Hits", "owner": "public" } },
+    "music-02-track":       { "tool": "play_track", "arguments": { "track": "Bohemian Rhapsody" } },
+    "cal-01-duration":      { "tool": "create_event", "arguments": { "title": "sync with Alex", "start": "2026-08-14T15:00:00-07:00", "duration_minutes": 60 } },
+    "pay-01-list":          { "tool": "list_payments", "arguments": { "limit": 10 } },
+    "pay-02-charge":        { "tool": "create_payment", "arguments": { "customer": "Alice", "amount": 50 } },
+    "pay-03-refund":        { "tool": "refund_payment", "arguments": { "customer": "John", "amount": 400 } },
+    "neg-01-weather":       { "tool": null, "arguments": {} },
+    "neg-02-thanks":        { "tool": null, "arguments": {} }
+  }
+}

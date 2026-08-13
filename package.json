@@ -1,0 +1,15 @@
+{
+  "name": "voiceos-eval",
+  "version": "0.1.0",
+  "description": "A universal tool-calling test runner and pre-execution safety gate for VoiceOS integrations.",
+  "main": "index.js",
+  "bin": { "voiceos-eval": "run.js" },
+  "scripts": {
+    "test": "bash test.sh",
+    "score": "node run.js",
+    "gate": "node run.js --gate",
+    "gen": "node gen.js",
+    "verify-demo": "node verify.js"
+  },
+  "license": "MIT"
+}

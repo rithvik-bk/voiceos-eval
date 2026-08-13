@@ -1,0 +1,17 @@
+{
+  "_comment": "DEFAULT FIXTURE = a healthy run: every logged tool call matches the answer key, so the release gate PASSES (this is what a good integration looks like). To see the runner catch real failures, run the opt-in buggy fixture: `node run.js --traces traces.buggy.json`. In production these rows come straight from a real tool-call export (user_message -> tool -> args, logged BEFORE execution). tool:null means the model made no tool call.",
+  "source": "hand-authored healthy fixture (all calls correct); swap for a real tool-call export",
+  "traces": {
+    "msg-01-direct":        { "tool": "send_imessage", "arguments": { "recipient": "Sam", "body": "I'm running late" } },
+    "msg-02-collision-email": { "tool": "send_email", "arguments": { "recipient": "Sam", "body": "the meeting notes" } },
+    "msg-03-collision-3":  { "tool": "send_imessage", "arguments": { "recipient": "Riley", "body": "I'm on my way" } },
+    "music-01-liked":       { "tool": "play_playlist", "arguments": { "playlist": "Liked Songs", "owner": "me" } },
+    "music-02-track":       { "tool": "play_track", "arguments": { "track": "Bohemian Rhapsody" } },
+    "cal-01-duration":      { "tool": "create_event", "arguments": { "title": "sync with Alex", "start": "2026-08-14T15:00:00-07:00", "duration_minutes": 30 } },
+    "pay-01-list":          { "tool": "list_payments", "arguments": { "limit": 10 } },
+    "pay-02-charge":        { "tool": "create_payment", "arguments": { "customer": "Alice", "amount": 50 } },
+    "pay-03-refund":        { "tool": "refund_payment", "arguments": { "customer": "Jane", "amount": 40 } },
+    "neg-01-weather":       { "tool": null, "arguments": {} },
+    "neg-02-thanks":        { "tool": null, "arguments": {} }
+  }
+}

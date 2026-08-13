@@ -1,0 +1,19 @@
+name: voiceos-eval release gate
+# Runs the tool-calling eval on every PR. Blocks merge if tool/param accuracy
+# drops below threshold or any critical (money/destructive) error appears.
+# Key-free: scores recorded tool calls (fixture) — no model call in CI.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run tool-calling eval gate
+        run: node run.js --gate

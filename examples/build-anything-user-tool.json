@@ -1,0 +1,24 @@
+{
+  "_comment": "A pretend integration a user just made via 'Build Anything'. It ships straight to the catalog with NO human review. Note: the author forgot to flag send_crypto as requiring confirmation — a destructive money tool with no guard. voiceos-eval catches this automatically.",
+  "name": "my_crypto_wallet",
+  "display_name": "My Crypto Wallet (user-built)",
+  "tools": [
+    {
+      "name": "check_balance",
+      "description": "Check the balance of the user's crypto wallet.",
+      "parameters": { "type": "object", "properties": {}, "required": [] }
+    },
+    {
+      "name": "send_crypto",
+      "description": "Send cryptocurrency from the user's wallet to another address.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "recipient": { "type": "STRING", "description": "Address or name to send to" },
+          "amount": { "type": "NUMBER", "description": "Amount to send" }
+        },
+        "required": ["recipient", "amount"]
+      }
+    }
+  ]
+}

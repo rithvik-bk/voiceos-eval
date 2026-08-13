@@ -1,0 +1,105 @@
+{
+  "_comment": "Gold cases = utterance + known-correct tool + parameters. reference_time fixes 'tomorrow/3pm' so temporal params are deterministic (VoiceOS's own advice). class labels: direct | collision | param-stress | negative | dangerous. critical params weighted 3x in scoring.",
+  "reference_time": "2026-08-13T12:00:00-07:00",
+  "cases": [
+    {
+      "id": "msg-01-direct",
+      "utterance": "text Sam I'm running late",
+      "class": "direct",
+      "expected_action": "CALL",
+      "expected_tool": "send_imessage",
+      "expected_parameters": { "recipient": "Sam", "body": "I'm running late" },
+      "criticality": { "recipient": "high" }
+    },
+    {
+      "id": "msg-02-collision-email",
+      "utterance": "email Sam the meeting notes",
+      "class": "collision",
+      "expected_action": "CALL",
+      "expected_tool": "send_email",
+      "expected_parameters": { "recipient": "Sam" },
+      "criticality": { "recipient": "high" }
+    },
+    {
+      "id": "msg-03-collision-3",
+      "utterance": "message Riley I'm on my way",
+      "class": "collision",
+      "expected_action": "CALL",
+      "expected_tool": "send_imessage",
+      "expected_parameters": { "recipient": "Riley", "body": "I'm on my way" },
+      "criticality": { "recipient": "high" }
+    },
+    {
+      "id": "music-01-liked",
+      "utterance": "play my Liked Songs",
+      "class": "param-stress",
+      "expected_action": "CALL",
+      "expected_tool": "play_playlist",
+      "expected_parameters": { "playlist": "Liked Songs", "owner": "me" },
+      "criticality": { "owner": "high" }
+    },
+    {
+      "id": "music-02-track",
+      "utterance": "play Bohemian Rhapsody",
+      "class": "direct",
+      "expected_action": "CALL",
+      "expected_tool": "play_track",
+      "expected_parameters": { "track": "Bohemian Rhapsody" },
+      "criticality": {}
+    },
+    {
+      "id": "cal-01-duration",
+      "utterance": "schedule a 30 minute sync with Alex tomorrow at 3pm",
+      "class": "param-stress",
+      "expected_action": "CALL",
+      "expected_tool": "create_event",
+      "expected_parameters": { "duration_minutes": 30, "start": "2026-08-14T15:00:00-07:00" },
+      "criticality": { "duration_minutes": "high", "start": "high" }
+    },
+    {
+      "id": "pay-01-list",
+      "utterance": "show me my recent payments",
+      "class": "direct",
+      "expected_action": "CALL",
+      "expected_tool": "list_payments",
+      "expected_parameters": {},
+      "criticality": {}
+    },
+    {
+      "id": "pay-02-charge",
+      "utterance": "charge Alice fifty dollars",
+      "class": "dangerous",
+      "expected_action": "CALL",
+      "expected_tool": "create_payment",
+      "expected_parameters": { "customer": "Alice", "amount": 50 },
+      "criticality": { "customer": "high", "amount": "high" }
+    },
+    {
+      "id": "pay-03-refund",
+      "utterance": "refund forty dollars to Jane",
+      "class": "dangerous",
+      "expected_action": "CALL",
+      "expected_tool": "refund_payment",
+      "expected_parameters": { "customer": "Jane", "amount": 40 },
+      "criticality": { "customer": "high", "amount": "high" }
+    },
+    {
+      "id": "neg-01-weather",
+      "utterance": "what's the weather today?",
+      "class": "negative",
+      "expected_action": "NO_TOOL",
+      "expected_tool": null,
+      "expected_parameters": {},
+      "criticality": {}
+    },
+    {
+      "id": "neg-02-thanks",
+      "utterance": "thanks, that's all",
+      "class": "negative",
+      "expected_action": "NO_TOOL",
+      "expected_tool": null,
+      "expected_parameters": {},
+      "criticality": {}
+    }
+  ]
+}

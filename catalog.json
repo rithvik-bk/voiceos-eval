@@ -1,0 +1,191 @@
+{
+  "_comment": "Example catalog in the standard manifest schema (name/description/parameters). Deliberately includes lookalike tools so the demo exercises real routing collisions. Point --catalog at your own integration manifest to run on real tools.",
+  "name": "voiceos_first_party_subset",
+  "display_name": "VoiceOS First-Party (subset for eval)",
+  "description": "A small set of tools chosen to include lookalike descriptions (message vs email, track vs playlist) that stress tool selection.",
+  "tools": [
+    {
+      "name": "send_imessage",
+      "description": "Send an iMessage (text message) to a person via the Messages app.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "recipient": {
+            "type": "STRING",
+            "description": "The person to text"
+          },
+          "body": {
+            "type": "STRING",
+            "description": "The message content"
+          }
+        },
+        "required": [
+          "recipient",
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "send_email",
+      "description": "Send an email to a person via the Mail app.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "recipient": {
+            "type": "STRING",
+            "description": "The person to email"
+          },
+          "subject": {
+            "type": "STRING",
+            "description": "The email subject"
+          },
+          "body": {
+            "type": "STRING",
+            "description": "The email content"
+          }
+        },
+        "required": [
+          "recipient",
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "play_playlist",
+      "description": "Play a playlist on Spotify.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "playlist": {
+            "type": "STRING",
+            "description": "Name of the playlist"
+          },
+          "owner": {
+            "type": "STRING",
+            "description": "Owner of the playlist: 'me' or 'public'"
+          }
+        },
+        "required": [
+          "playlist"
+        ]
+      }
+    },
+    {
+      "name": "play_track",
+      "description": "Play a single track or song on Spotify.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "track": {
+            "type": "STRING",
+            "description": "Name of the track"
+          }
+        },
+        "required": [
+          "track"
+        ]
+      }
+    },
+    {
+      "name": "create_event",
+      "description": "Create a calendar event.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "title": {
+            "type": "STRING",
+            "description": "Event title"
+          },
+          "start": {
+            "type": "STRING",
+            "description": "ISO start time"
+          },
+          "duration_minutes": {
+            "type": "NUMBER",
+            "description": "Duration in minutes"
+          }
+        },
+        "required": [
+          "title",
+          "start"
+        ]
+      }
+    },
+    {
+      "name": "list_payments",
+      "description": "List recent payments on Stripe. Read-only.",
+      "risk": "low",
+      "requires_confirmation": false,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "customer": {
+            "type": "STRING",
+            "description": "Optional customer to filter by"
+          },
+          "limit": {
+            "type": "NUMBER",
+            "description": "How many to return"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_payment",
+      "description": "Charge a customer a specific amount on Stripe.",
+      "risk": "high",
+      "requires_confirmation": true,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "customer": {
+            "type": "STRING",
+            "description": "Customer name, email, or ID"
+          },
+          "amount": {
+            "type": "NUMBER",
+            "description": "Amount to charge in dollars"
+          }
+        },
+        "required": [
+          "customer",
+          "amount"
+        ]
+      }
+    },
+    {
+      "name": "refund_payment",
+      "description": "Refund a payment to a customer on Stripe.",
+      "risk": "high",
+      "requires_confirmation": true,
+      "parameters": {
+        "type": "OBJECT",
+        "properties": {
+          "customer": {
+            "type": "STRING",
+            "description": "Customer whose payment to refund"
+          },
+          "amount": {
+            "type": "NUMBER",
+            "description": "Amount to refund in dollars"
+          }
+        },
+        "required": [
+          "customer",
+          "amount"
+        ]
+      }
+    }
+  ]
+}
