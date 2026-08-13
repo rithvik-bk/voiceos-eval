@@ -65,6 +65,7 @@ Every entrypoint, no hidden steps. All run on Node alone; the `live` and descrip
 | `node gen.js --catalog <manifest>` | Auto-generate an answer key from any manifest. `> gold.json`. Add `--llm` to naturalize phrasing via `claude -p` without changing the answers. |
 | `node gate-benchmark.js` | Measured before/after for the guard: 8/8 wrong actions blocked (wrong amount, wrong recipient, wrong destructive target), 0 false blocks on 8 correct actions. |
 | `bash new-tool-demo.sh` | End-to-end on a brand-new, unreviewed tool: auto-generate its cases, auto-detect its destructive tools, and block a wrong send — zero manual work. |
+| `node optimize.js` | Routing regression harness: measures live routing on a held-out set, auto-rewrites a confusable tool description, and re-measures. On a mislabeled auto-generated description (Build-Anything ships these with no review) the measured lift is **75% → 100%**. Live via `claude -p`, no key; numbers measured each run. |
 
 ## Use it on your own integration
 
